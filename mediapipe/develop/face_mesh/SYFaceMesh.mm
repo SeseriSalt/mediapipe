@@ -1,4 +1,4 @@
-#import "MPPBIris.h"
+#import "SYFaceMesh.h"
 #import "mediapipe/objc/MPPGraph.h"
 #import "mediapipe/objc/MPPCameraInputSource.h"
 #import "mediapipe/objc/MPPLayerRenderer.h"
@@ -12,7 +12,7 @@ static const char* kOutputStream = "output_video";
 static const char* kLandmarksOutputStream = "multi_face_landmarks";
 static const char* kVideoQueueLabel = "com.mediapipe.prebuilt.example.videoQueue";
 
-@interface HandTracker() <MPPGraphDelegate>
+@interface SYFaceMesh() <MPPGraphDelegate>
 @property(nonatomic) MPPGraph* mediapipeGraph;
 @end
 
