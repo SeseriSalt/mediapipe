@@ -9,8 +9,12 @@ static NSString* const kGraphName = @"face_mesh_mobile_gpu";
 static const char* kInputStream = "input_video";
 static const char* kOutputStream = "output_video";
 
+static const char* kNumFacesInputSidePacket = "num_faces";
 static const char* kLandmarksOutputStream = "multi_face_landmarks";
 static const char* kVideoQueueLabel = "com.mediapipe.prebuilt.example.videoQueue";
+
+// Max number of faces to detect/process.
+static const int kNumFaces = 1;
 
 @interface SYFaceMesh() <MPPGraphDelegate>
 @property(nonatomic) MPPGraph* mediapipeGraph;
@@ -55,6 +59,10 @@ static const char* kVideoQueueLabel = "com.mediapipe.prebuilt.example.videoQueue
     
     // Create MediaPipe graph with mediapipe::CalculatorGraphConfig proto object.
     MPPGraph* newGraph = [[MPPGraph alloc] initWithGraphConfig:config];
+
+
+    [newGraph setSidePacket:(mediapipe::MakePacket<int>(kNumFaces))
+                      named:kNumFacesInputSidePacket];
     [newGraph addFrameOutputStream:kOutputStream outputPacketType:MPPPacketTypePixelBuffer];
     [newGraph addFrameOutputStream:kLandmarksOutputStream outputPacketType:MPPPacketTypeRaw];
     return newGraph;
@@ -97,20 +105,23 @@ static const char* kVideoQueueLabel = "com.mediapipe.prebuilt.example.videoQueue
             fromStream:(const std::string&)streamName {
     if (streamName == kLandmarksOutputStream) {
         if (packet.IsEmpty()) { return; }
-        const auto& landmarks = packet.Get<::mediapipe::NormalizedLandmarkList>();
+        const auto& multi_face_landmarks = packet.Get<std::vector<::mediapipe::NormalizedLandmarkList>>();
         
         //        for (int i = 0; i < landmarks.landmark_size(); ++i) {
         //            NSLog(@"\tLandmark[%d]: (%f, %f, %f)", i, landmarks.landmark(i).x(),
         //                  landmarks.landmark(i).y(), landmarks.landmark(i).z());
         //        }
-        NSMutableArray<Landmark *> *result = [NSMutableArray array];
-        for (int i = 0; i < landmarks.landmark_size(); ++i) {
-            Landmark *landmark = [[Landmark alloc] initWithX:landmarks.landmark(i).x()
-                                                           y:landmarks.landmark(i).y()
-                                                           z:landmarks.landmark(i).z()];
-            [result addObject:landmark];
+        for (int face_index = 0; face_index < multi_face_landmarks.size(); ++face_index) {
+            const auto& landmarks = multi_face_landmarks[face_index];
+            NSMutableArray<Landmark *> *result = [NSMutableArray array];
+            for (int i = 0; i < landmarks.landmark_size(); ++i) {
+                Landmark *landmark = [[Landmark alloc] initWithX:landmarks.landmark(i).x()
+                                                            y:landmarks.landmark(i).y()
+                                                            z:landmarks.landmark(i).z()];
+                [result addObject:landmark];
+            }
+            [_delegate faceMeshTracker: self didOutputLandmarks: result];
         }
-        [_delegate faceMeshTracker: self didOutputLandmarks: result];
     }
 }
 
