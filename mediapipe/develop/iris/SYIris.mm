@@ -9,7 +9,7 @@ static NSString* const kGraphName = @"iris_tracking_gpu";
 static const char* kInputStream = "input_video";
 static const char* kOutputStream = "output_video";
 
-static const char* kLandmarksOutputStream = "iris_landmarks";
+static const char* kLandmarksOutputStream = "face_landmarks_with_iris";
 static const char* kVideoQueueLabel = "com.mediapipe.prebuilt.example.videoQueue";
 
 /// Input side packet for focal length parameter.
