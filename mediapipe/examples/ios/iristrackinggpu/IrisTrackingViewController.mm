@@ -88,6 +88,7 @@ static const char* kLeftDepth = "left_iris_depth_mm";
   // constant. In that case, we need to use input stream instead of using side packet.
   *(_input_side_packets["focal_length_pixel"].Get<std::unique_ptr<float>>()) =
       self.cameraSource.cameraIntrinsicMatrix.columns[0][0];
+      NSLog(@"Focal length: %f", self.cameraSource.cameraIntrinsicMatrix.columns[0][0]);
   [self.mediapipeGraph sendPixelBuffer:imageBuffer
                             intoStream:self.graphInputStream
                             packetType:MPPPacketTypePixelBuffer];
