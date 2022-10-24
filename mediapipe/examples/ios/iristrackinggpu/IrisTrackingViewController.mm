@@ -18,6 +18,8 @@
 
 static const char* kLandmarksOutputStream = "iris_landmarks";
 
+static const char* kLeftDepth = "left_iris_depth_mm";
+
 @implementation IrisTrackingViewController {
   /// Input side packet for focal length parameter.
   std::map<std::string, mediapipe::Packet> _input_side_packets;
@@ -37,6 +39,9 @@ static const char* kLandmarksOutputStream = "iris_landmarks";
       {"focal_length_pixel", _focal_length_side_packet},
   };
   [self.mediapipeGraph addSidePackets:_input_side_packets];
+  [self.mediapipeGraph addFrameOutputStream:kLeftDepth
+                           outputPacketType:MPPPacketTypeRaw];
+
 }
 
 #pragma mark - MPPGraphDelegate methods
@@ -57,6 +62,14 @@ static const char* kLandmarksOutputStream = "iris_landmarks";
       NSLog(@"\tLandmark[%d]: (%f, %f, %f)", i, landmarks.landmark(i).x(),
             landmarks.landmark(i).y(), landmarks.landmark(i).z());
     }
+  }
+  if (streamName == kLeftDepth) {
+    if (packet.IsEmpty()) {
+      NSLog(@"[TS:%lld] No iris depth", packet.Timestamp().Value());
+      return;
+    }
+    const auto& depth = packet.Get<float>();
+    NSLog(@"[TS:%lld] Left iris depth: %f", packet.Timestamp().Value(), depth);
   }
 }
 

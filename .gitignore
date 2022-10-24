@@ -11,3 +11,4 @@ mediapipe/examples/.DS_Store
 mediapipe/framework/.DS_Store
 mediapipe/develop/.DS_Store
 .DS_Store
+mediapipe/examples/ios/bundle_id.bzl
