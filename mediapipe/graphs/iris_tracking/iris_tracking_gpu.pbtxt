@@ -153,6 +153,7 @@ node {
   input_side_packet: "FOCAL_LENGTH:focal_length_pixel"
   output_stream: "LEFT_IRIS_DEPTH_MM:left_iris_depth_mm"
   output_stream: "RIGHT_IRIS_DEPTH_MM:right_iris_depth_mm"
+  output_stream: "IMAGE_SIZE:image_size"
   output_stream: "IRIS_LANDMARKS:iris_landmarks"
   output_stream: "IMAGE:output_video"
 }

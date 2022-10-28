@@ -20,6 +20,8 @@ static const char* kLandmarksOutputStream = "iris_landmarks";
 
 static const char* kLeftDepth = "left_iris_depth_mm";
 
+static const char* kImageSize = "image_size";
+
 @implementation IrisTrackingViewController {
   /// Input side packet for focal length parameter.
   std::map<std::string, mediapipe::Packet> _input_side_packets;
@@ -41,6 +43,8 @@ static const char* kLeftDepth = "left_iris_depth_mm";
   [self.mediapipeGraph addSidePackets:_input_side_packets];
   [self.mediapipeGraph addFrameOutputStream:kLeftDepth
                            outputPacketType:MPPPacketTypeRaw];
+  [self.mediapipeGraph addFrameOutputStream:kImageSize
+                           outputPacketType:MPPPacketTypeRaw];
 
 }
 
@@ -59,7 +63,7 @@ static const char* kLeftDepth = "left_iris_depth_mm";
     NSLog(@"[TS:%lld] Number of landmarks on iris: %d", packet.Timestamp().Value(),
           landmarks.landmark_size());
     for (int i = 0; i < landmarks.landmark_size(); ++i) {
-      NSLog(@"\tLandmark[%d]: (%f, %f, %f)", i, landmarks.landmark(i).x(),
+      NSLog(@"Landmark[%d]: (%f, %f, %f)", i, landmarks.landmark(i).x(),
             landmarks.landmark(i).y(), landmarks.landmark(i).z());
     }
   }
@@ -70,6 +74,14 @@ static const char* kLeftDepth = "left_iris_depth_mm";
     }
     const auto& depth = packet.Get<float>();
     NSLog(@"[TS:%lld] Left iris depth: %f", packet.Timestamp().Value(), depth);
+  }
+  if (streamName == kImageSize) {
+    if (packet.IsEmpty()) {
+      NSLog(@"[TS:%lld] No image size", packet.Timestamp().Value());
+      return;
+    }
+    const auto& size = packet.Get<std::pair<int, int>>();
+    NSLog(@"Image size: %d x %d",  size.first, size.second);
   }
 }
 
